@@ -339,50 +339,30 @@ func printStats(stats *Stats, accountCount int) {
         successRate = float64(apiSuccess) / float64(apiCalls) * 100
     }
 
-    output := fmt.Sprintf("
-"+
-        "==== [%s] STATS ====
-"+
-        "Elapsed:        %v
-"+
-        "Files:          %d (%.0f/sec)
-"+
-        "Folders:        %d
-"+
-        "API Calls:      %d (%.1f/sec)
-"+
-        "API Success:    %d (%.1f%%)
-"+
-        "API Failed:     %d
-"+
-        "DB Inserts:     %d
-",
-        stats.TeamDriveName,
-        elapsed.Round(time.Second),
-        files, filesPerSec,
-        folders,
-        apiCalls, apiPerSec,
-        apiSuccess, successRate,
-        apiFailed,
-        dbInserts,
-    )
+    log.Printf("
+==== [%s] STATS ====", stats.TeamDriveName)
+    log.Printf("Elapsed:        %v", elapsed.Round(time.Second))
+    log.Printf("Files:          %d (%.0f/sec)", files, filesPerSec)
+    log.Printf("Folders:        %d", folders)
+    log.Printf("API Calls:      %d (%.1f/sec)", apiCalls, apiPerSec)
+    log.Printf("API Success:    %d (%.1f%%)", apiSuccess, successRate)
+    log.Printf("API Failed:     %d", apiFailed)
+    log.Printf("DB Inserts:     %d", dbInserts)
 
     if accountCount > 0 {
-        output += fmt.Sprintf("Accounts Used:  %d
-", accountCount)
+        log.Printf("Accounts Used:  %d", accountCount)
     }
 
-    output += "========================"
-    log.Println(output)
+    log.Println("========================")
 }
 
 func printFinalStats(stats *Stats, accountCount int) {
+    elapsed := time.Since(stats.StartTime)
+    files := stats.FilesProcessed.Load()
+
     log.Printf("
 === [%s] FINAL STATS ===", stats.TeamDriveName)
     printStats(stats, accountCount)
-
-    elapsed := time.Since(stats.StartTime)
-    files := stats.FilesProcessed.Load()
 
     log.Printf("
 [%s] Total Duration: %v", stats.TeamDriveName, elapsed.Round(time.Millisecond))

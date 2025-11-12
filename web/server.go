@@ -38,7 +38,8 @@ func NewServer(db *database.Database, teamDrives interface{}) *Server {
     app.Use(recover.New())
     app.Use(logger.New(logger.Config{
         Format:     "[${time}] ${status} - ${latency} ${method} ${path}
-",
+",  // Fixed: proper 
+
         TimeFormat: "2006-01-02 15:04:05",
     }))
     app.Use(cors.New(cors.Config{
