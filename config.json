@@ -1,0 +1,28 @@
+{
+  "service_accounts_dir": "./service_accounts",
+  "teamdrives": [
+    {
+      "id": "YOUR_TEAM_DRIVE_ID_1",
+      "name": "Marketing Team Drive"
+    },
+    {
+      "id": "YOUR_TEAM_DRIVE_ID_2",
+      "name": "Engineering Team Drive"
+    }
+  ],
+  "scanner": {
+    "workers_per_account": 2,
+    "rate_per_account": 10,
+    "page_size": 1000,
+    "batch_insert_size": 10000,
+    "concurrent_teamdrives": 2
+  },
+  "database": {
+    "path": "teamdrives.db",
+    "cache_size_mb": 512
+  },
+  "web": {
+    "port": 8080,
+    "host": "0.0.0.0"
+  }
+}

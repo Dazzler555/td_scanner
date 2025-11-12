@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TeamDrive Explorer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📁 TeamDrive Explorer</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder='Search: foo, -bar, "exact match"' autocomplete="off">
+                <button id="searchBtn">🔍 Search</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <h3>Team Drives</h3>
+                <div id="teamDriveList" class="teamdrive-list"></div>
+            </aside>
+
+            <main class="content">
+                <div class="breadcrumb" id="breadcrumb"></div>
+                
+                <div class="stats" id="stats"></div>
+
+                <div class="file-list" id="fileList">
+                    <div class="loading">Loading...</div>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </main>
+        </div>
+    </div>
+
+    <div id="contextMenu" class="context-menu" style="display: none;">
+        <div class="context-menu-item" data-action="copy">📋 Copy Name</div>
+        <div class="context-menu-item" data-action="copy-path">📂 Copy Full Path</div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
