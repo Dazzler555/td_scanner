@@ -46,7 +46,7 @@ type Stats struct {
 type Worker struct {
 	id          int
 	pool        *ServiceAccountPool
-	jobQueue    <-chan string
+	jobQueue    chan string // ✅ fixed from <-chan to chan
 	resultQueue chan<- database.FileRecord
 	wg          *sync.WaitGroup
 	ctx         context.Context
@@ -101,8 +101,6 @@ func InitServiceAccountPool(saDir string, ratePerAccount int) (*ServiceAccountPo
 }
 
 func (p *ServiceAccountPool) getNext() (*drive.Service, *rate.Limiter) {
-	// Rotate through accounts in a round-robin fashion.
-	// Use Add(1)-1 so the index is zero-based.
 	idx := int(p.current.Add(1)-1) % len(p.services)
 	if idx < 0 {
 		idx = 0
@@ -153,10 +151,7 @@ func ScanTeamDrive(config ScanConfig, db *database.Database, pool *ServiceAccoun
 	// seed root folder
 	jobQueue <- config.TeamDriveID
 
-	// close jobQueue when all work is done:
-	// Currently workers exit when jobQueue is closed. To stop properly you'd
-	// need to close(jobQueue) when there are no more folders. For now we wait
-	// for workers to finish (they'll exit if jobQueue is closed externally).
+	// wait for workers
 	wg.Wait()
 	close(resultQueue)
 	<-dbDone
@@ -189,7 +184,6 @@ func (w *Worker) listFolder(folderID string) error {
 		}
 
 		query := fmt.Sprintf("'%s' in parents and trashed=false", folderID)
-
 		w.stats.APICallsTotal.Add(1)
 
 		call := service.Files.List().
@@ -230,10 +224,7 @@ func (w *Worker) listFolder(folderID string) error {
 
 			if isFolder {
 				w.stats.FoldersQueued.Add(1)
-				// enqueue folder for processing by workers:
-				go func(id string) {
-					w.jobQueue <- id
-				}(file.Id)
+				w.jobQueue <- file.Id // ✅ no goroutine, safe enqueue
 			}
 		}
 
@@ -308,7 +299,6 @@ func dbWriter(db *database.Database, resultQueue <-chan database.FileRecord, don
 			}
 
 			batch = append(batch, record)
-
 			if len(batch) >= batchSize {
 				flush()
 			}
