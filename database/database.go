@@ -35,6 +35,7 @@ type SearchResult struct {
     TotalCount int          `json:"total_count"`
 }
 
+
 func InitDatabase(path string, cacheSizeMB int) (*Database, error) {
     db, err := sql.Open("sqlite3", fmt.Sprintf("%s?cache=shared&mode=rwc&_journal_mode=WAL&_busy_timeout=5000", path))
     if err != nil {
@@ -89,6 +90,7 @@ func InitDatabase(path string, cacheSizeMB int) (*Database, error) {
         return nil, fmt.Errorf("schema creation failed: %w", err)
     }
 
+    // Simplified FTS5 for maximum compatibility
     ftsSchema := `
     CREATE VIRTUAL TABLE IF NOT EXISTS files_fts USING fts5(
         id UNINDEXED,
@@ -96,8 +98,7 @@ func InitDatabase(path string, cacheSizeMB int) (*Database, error) {
         path,
         teamdrive_name UNINDEXED,
         content='files',
-        content_rowid='rowid',
-        tokenize='porter unicode61 remove_diacritics 1 tokenchars "._-"'
+        content_rowid='rowid'
     );
 
     CREATE TRIGGER IF NOT EXISTS files_ai AFTER INSERT ON files BEGIN
